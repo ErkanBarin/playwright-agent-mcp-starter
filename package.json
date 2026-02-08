@@ -1,5 +1,5 @@
 {
-  "name": "qa-playwright-ts-mcp-boilerplate",
+  "name": "playwright-agent-mcp-starter",
   "version": "1.0.0",
   "description": "Production-ready QA automation boilerplate using Playwright with TypeScript, Page Object Model, and MCP support.",
   "license": "MIT",

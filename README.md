@@ -1,6 +1,6 @@
-# QA Playwright TypeScript MCP Boilerplate
+# Playwright Agent MCP Starter
 
-[![Playwright Tests](https://github.com/ErkanBarin/qa-playwright-ts-mcp-boilerplate/actions/workflows/playwright.yml/badge.svg)](https://github.com/ErkanBarin/qa-playwright-ts-mcp-boilerplate/actions/workflows/playwright.yml)
+[![Playwright Tests](https://github.com/ErkanBarin/playwright-agent-mcp-starter/actions/workflows/playwright.yml/badge.svg)](https://github.com/ErkanBarin/playwright-agent-mcp-starter/actions/workflows/playwright.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Production-ready starter for **UI + API test automation** with Playwright, TypeScript, Page Object Model, and AI-powered Claude Code agents via MCP.
@@ -29,8 +29,8 @@ Production-ready starter for **UI + API test automation** with Playwright, TypeS
 
 ```bash
 # 1. Use this template (click "Use this template" on GitHub) — or clone directly
-git clone https://github.com/ErkanBarin/qa-playwright-ts-mcp-boilerplate.git
-cd qa-playwright-ts-mcp-boilerplate
+git clone https://github.com/ErkanBarin/playwright-agent-mcp-starter.git
+cd playwright-agent-mcp-starter
 
 # 2. Install dependencies
 npm install
