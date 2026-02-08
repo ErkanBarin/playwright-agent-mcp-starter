@@ -1,152 +1,111 @@
 # QA Playwright TypeScript MCP Boilerplate
 
-A production-ready template for QA Automation Engineers (JR/SR) to jumpstart UI and API test automation with **Playwright**, **TypeScript**, and **MCP** (Model Context Protocol) support.
+[![Playwright Tests](https://github.com/ErkanBarin/qa-playwright-ts-mcp-boilerplate/actions/workflows/playwright.yml/badge.svg)](https://github.com/ErkanBarin/qa-playwright-ts-mcp-boilerplate/actions/workflows/playwright.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-## Features
+Production-ready starter for **UI + API test automation** with Playwright, TypeScript, Page Object Model, and AI-powered Claude Code agents via MCP.
 
-- **UI Automation** — Playwright Test with Page Object Model, custom fixtures, and cross-browser support
-- **API Automation** — Playwright `request` API for HTTP testing, plus optional Postman/Newman skeleton
-- **MCP Integration** — Pre-configured for `@playwright/mcp` (browser tools) and Playwright Test MCP (test runner tools)
-- **AI Agents & Skills** — Claude Code agents for test design, PR hygiene, security scanning, flake triage, and more
-- **Documentation** — QA conventions, prompt library, PR workflow, and security sanitization guides
+---
 
-## Quick Start
+## Who It's For
+
+- **Jr QA Engineers** who want a clean, opinionated Playwright + TypeScript starting point
+- **Sr SDETs** who want a batteries-included template with AI agent tooling and MCP integration
+- **Teams** that want repeatable PR workflows — small scope, stable selectors, no flaky sleeps
+
+---
+
+## What's Included
+
+- **UI testing** — Playwright Test with Page Object Model, custom fixtures, cross-browser (Chromium, Firefox, WebKit)
+- **API testing** — Playwright `request` API for HTTP testing, plus optional Postman/Newman skeleton
+- **11 AI agents** — Claude Code agents for test design, PR hygiene, security scanning, flake triage, coverage analysis, and more
+- **2 MCP servers** — `@playwright/mcp` (browser automation) + Playwright Test MCP (test runner)
+- **Docs library** — QA conventions, prompt library, PR workflow, security sanitization, MCP setup
+
+---
+
+## 5-Minute Quickstart
 
 ```bash
-# 1. Use this template on GitHub → "Use this template" button
-# 2. Clone your new repo
-git clone https://github.com/<your-org>/<your-repo>.git
-cd <your-repo>
+# 1. Use this template (click "Use this template" on GitHub) — or clone directly
+git clone https://github.com/ErkanBarin/qa-playwright-ts-mcp-boilerplate.git
+cd qa-playwright-ts-mcp-boilerplate
 
-# 3. Install dependencies
+# 2. Install dependencies
 npm install
 
-# 4. Set up environment
+# 3. Set up environment
 cp .env.example .env
-# Edit .env with your application's base URL
+# Edit .env → set BASE_URL to your app (defaults to https://example.com)
+
+# 4. Set up MCP (optional, for Claude Code users)
+cp .mcp.json.example .mcp.json
 
 # 5. Install browsers
 npx playwright install
 
-# 6. Run tests
-npm test
+# 6. Run one UI test (proof it works)
+npx playwright test tests/ui/smoke.spec.ts --project=chromium
+
+# 7. Run one API test
+npx playwright test tests/api/health.spec.ts --project=chromium
+
+# 8. See the HTML report
+npm run report
 ```
 
-## Project Structure
+> **Note:** The default `BASE_URL` is `https://example.com` — the smoke tests run against this public URL out of the box. Change it in `.env` to point to your application.
+
+---
+
+## Repository Structure
 
 ```
 ├── .claude/
-│   ├── agents/          # AI agents for QA workflows
-│   │   ├── qa-orchestrator.md
-│   │   ├── ui-test-designer.md
-│   │   ├── api-coverage-planner.md
-│   │   ├── pr-hygiene.md
-│   │   ├── security-scout.md
-│   │   ├── coverage-hunter.md
-│   │   ├── flake-triage.md
-│   │   ├── ci-reporter.md
-│   │   ├── docs-writer.md
-│   │   ├── mcp-explorer.md
-│   │   └── seed-data-manager.md
-│   └── skills/          # Reusable prompt skills
-│       ├── mcp-scout.md
-│       └── prompt-library.md
+│   ├── agents/          # 11 AI agents (test design, PR hygiene, security, etc.)
+│   └── skills/          # Reusable prompt skills (MCP scout, prompt library)
 ├── docs/
-│   ├── QA_CONTEXT.md           # Scope, selectors, waits, PR slicing
-│   ├── PROMPT_LIBRARY.md       # Copy-paste prompts for common tasks
-│   ├── PR_WORKFLOW.md          # Standard PR flow guide
-│   ├── SECURITY_SANITIZATION.md # What to check before publishing
-│   └── MCP_SETUP.md            # MCP server configuration guide
-├── pages/                # Page Object Models
-│   ├── base.page.ts
-│   └── login.page.ts
+│   ├── QA_CONTEXT.md    # Scope, selectors, waits, PR slicing
+│   ├── PROMPT_LIBRARY.md
+│   ├── PR_WORKFLOW.md
+│   ├── SECURITY_SANITIZATION.md
+│   └── MCP_SETUP.md
+├── pages/               # Page Object Models (base + login example)
 ├── tests/
-│   ├── fixtures/         # Custom Playwright fixtures
-│   │   └── base.fixture.ts
-│   ├── ui/               # UI test specs
-│   │   └── smoke.spec.ts
-│   └── api/              # API test specs
-│       └── health.spec.ts
-├── utils/                # Shared helpers
-│   ├── env.ts
-│   └── api-helpers.ts
-├── postman/              # Optional Newman/Postman skeleton
-├── .mcp.json.example     # MCP server config template
-├── playwright.config.ts  # Playwright configuration
+│   ├── fixtures/        # Custom Playwright fixtures
+│   ├── ui/              # UI test specs (smoke.spec.ts)
+│   └── api/             # API test specs (health.spec.ts)
+├── utils/               # Shared helpers (env, API utilities)
+├── .mcp.json.example    # MCP server config template
+├── playwright.config.ts
 └── package.json
 ```
+
+---
 
 ## Scripts
 
 | Command | Description |
 |---------|-------------|
-| `npm test` | Run all tests |
-| `npm run test:ui` | Run UI tests only (`@ui` tag) |
-| `npm run test:api` | Run API tests only (`@api` tag) |
-| `npm run test:debug` | Run tests with Playwright Inspector |
+| `npm test` | Run all tests (all browsers) |
+| `npm run test:ui` | Run UI tests only |
+| `npm run test:api` | Run API tests only |
+| `npm run test:debug` | Run with Playwright Inspector |
 | `npm run report` | Open the HTML test report |
 | `npm run lint` | Lint TypeScript files |
 
-## MCP Setup
-
-This boilerplate supports two MCP servers for Claude Code integration:
-
-1. **`playwright`** — Browser automation (navigate, click, fill, screenshot)
-2. **`playwright-test`** — Test runner (run tests, view results, manage execution)
-
-```bash
-cp .mcp.json.example .mcp.json
-```
-
-See [docs/MCP_SETUP.md](docs/MCP_SETUP.md) for full setup instructions.
-
-## Writing Tests
-
-### UI Tests (Page Object Model)
-
-```typescript
-import { test, expect } from '../fixtures/base.fixture';
-import { LoginPage } from '../../pages/login.page';
-
-test('user can log in @ui @smoke', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  await loginPage.navigateToLogin();
-  await loginPage.login('testuser', 'password123');
-  await expect(page).toHaveURL(/dashboard/);
-});
-```
-
-### API Tests (Playwright Request)
-
-```typescript
-import { test, expect } from '../fixtures/base.fixture';
-
-test('GET /api/users returns 200 @api', async ({ apiContext }) => {
-  const response = await apiContext.get('/api/users');
-  expect(response.status()).toBe(200);
-  expect(response.headers()['content-type']).toContain('application/json');
-});
-```
-
-### Selector Priority
-
-1. **Role-based** (preferred): `page.getByRole('button', { name: 'Submit' })`
-2. **Test ID**: `page.getByTestId('login-form')`
-3. **Text**: `page.getByText('Welcome')` — for assertions
-4. **CSS**: Avoid — fragile
-5. **XPath**: Never unless no alternative
-
-See [docs/QA_CONTEXT.md](docs/QA_CONTEXT.md) for full conventions.
+---
 
 ## AI Agents
 
-Use Claude Code agents to accelerate QA workflows:
+11 Claude Code agents are included to accelerate QA workflows. They work inside Claude Code (CLI or VS Code extension).
 
 | Agent | Purpose |
 |-------|---------|
 | `qa-orchestrator` | Coordinates all specialist agents |
 | `ui-test-designer` | Designs UI test cases from user stories |
-| `api-coverage-planner` | Plans API test coverage |
+| `api-coverage-planner` | Plans API test coverage from endpoints |
 | `pr-hygiene` | Checks PR quality and standards |
 | `security-scout` | Scans for secrets and vulnerabilities |
 | `coverage-hunter` | Finds test coverage gaps |
@@ -156,22 +115,72 @@ Use Claude Code agents to accelerate QA workflows:
 | `mcp-explorer` | Discovers MCP server capabilities |
 | `seed-data-manager` | Manages test data and fixtures |
 
+### Copy-Paste Prompts
+
+```
+Design UI tests for the login page following POM pattern. Check existing
+page objects first, then create missing ones. Tag all tests @ui @smoke.
+```
+
+```
+Scan this repo for hardcoded secrets, API keys, tokens, and internal URLs.
+Report findings with file paths and line numbers.
+```
+
+```
+Analyze test coverage gaps. Map page objects and API endpoints to existing
+tests. Show what's untested and prioritize by risk.
+```
+
+See [docs/PROMPT_LIBRARY.md](docs/PROMPT_LIBRARY.md) for the full prompt library.
+
+---
+
+## MCP Setup
+
+Two MCP servers connect Claude Code to your browser and test runner:
+
+| Server | What it does |
+|--------|--------------|
+| `playwright` | Navigate, click, fill, screenshot, inspect DOM |
+| `playwright-test` | Run tests, get results, manage execution |
+
+```bash
+cp .mcp.json.example .mcp.json
+```
+
+See [docs/MCP_SETUP.md](docs/MCP_SETUP.md) for prerequisites, VS Code extensions, and a sanity check walkthrough.
+
+---
+
+## CI
+
+This repo includes a GitHub Actions workflow that runs all Playwright tests on every push and PR to `main`.
+
+It works out of the box — no configuration needed.
+
+See [.github/workflows/playwright.yml](.github/workflows/playwright.yml) for the workflow definition.
+
+---
+
 ## Documentation
 
-- [QA Context & Conventions](docs/QA_CONTEXT.md)
-- [Prompt Library](docs/PROMPT_LIBRARY.md)
-- [PR Workflow](docs/PR_WORKFLOW.md)
-- [Security Sanitization](docs/SECURITY_SANITIZATION.md)
-- [MCP Setup](docs/MCP_SETUP.md)
+- [MCP Setup](docs/MCP_SETUP.md) — MCP server configuration and sanity check
+- [QA Context & Conventions](docs/QA_CONTEXT.md) — scope, selectors, waits, PR slicing
+- [Prompt Library](docs/PROMPT_LIBRARY.md) — copy-paste prompts for agents
+- [PR Workflow](docs/PR_WORKFLOW.md) — standard PR flow
+- [Security Sanitization](docs/SECURITY_SANITIZATION.md) — pre-publish checklist
+
+---
 
 ## Contributing
 
-1. Create a feature branch from `main`
-2. Follow the [PR Workflow](docs/PR_WORKFLOW.md)
-3. Ensure all tests pass: `npm test`
-4. Ensure no lint errors: `npm run lint`
-5. Submit a PR using the template
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Security
+
+See [SECURITY.md](SECURITY.md).
 
 ## License
 
-MIT
+[MIT](LICENSE)

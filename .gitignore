@@ -15,6 +15,9 @@ dist/
 # Environment variables (never commit secrets)
 .env
 
+# MCP configuration (may contain secrets)
+.mcp.json
+
 # OS files
 .DS_Store
 Thumbs.db

@@ -15,6 +15,26 @@ This project uses two MCP servers:
 | **playwright** | `@playwright/mcp` | Browser automation -- navigate pages, click elements, fill forms, take screenshots, inspect the DOM |
 | **playwright-test** | `@playwright/test --mcp` | Test runner -- execute Playwright tests, get results, manage test execution |
 
+---
+
+## Prerequisites
+
+| Requirement | Notes |
+|---|---|
+| **Node.js** >= 18 | Required for Playwright and MCP servers |
+| **Claude Code** | CLI or VS Code extension (`anthropic.claude-code`) |
+| **Playwright VS Code extension** (optional) | `ms-playwright.playwright` — run/debug tests from the sidebar |
+
+```bash
+# Install VS Code extensions (optional, for VS Code / Cursor users)
+code --install-extension anthropic.claude-code
+code --install-extension ms-playwright.playwright
+```
+
+> **Note:** Claude Code also works from the terminal without VS Code. The extensions are recommended but not required.
+
+---
+
 ### When to Use Each Server
 
 | Task | Server |
@@ -38,6 +58,8 @@ The repository includes a safe example configuration. Copy it to create your loc
 ```bash
 cp .mcp.json.example .mcp.json
 ```
+
+> **Important:** The `.mcp.json` file **must** live in the repository root (the same directory as `package.json`). Claude Code looks for it in the current working directory when it starts. If it is in a subdirectory, MCP servers will not be detected.
 
 ### 2. Understand the Configuration
 
@@ -82,15 +104,46 @@ npm install
 npx playwright install --with-deps
 ```
 
-### 4. Verify the Setup
+### 4. Sanity Check — Verify MCP Is Working
 
-Open Claude Code in this project directory. Claude Code automatically detects the `.mcp.json` file and starts the configured servers.
+**Step 1 — Confirm `.mcp.json` exists at the repo root:**
 
-To verify, ask Claude Code:
+```bash
+ls -la .mcp.json
+# Expected: -rw-r--r-- ... .mcp.json
+```
+
+**Step 2 — Start Claude Code in the project directory:**
+
+```bash
+cd /path/to/your-repo
+claude
+```
+
+**Step 3 — Ask Claude Code to list MCP tools:**
 
 ```
-Show me available Playwright MCP tools for browser automation.
+Show me available Playwright MCP tools.
 ```
+
+You should see tools from both servers, including:
+
+- `browser_navigate` — Navigate to a URL
+- `browser_click` — Click an element
+- `browser_snapshot` — Take an accessibility snapshot
+- `browser_screenshot` — Capture a screenshot
+- `run_tests` — Execute Playwright tests
+- `list_tests` — List available tests
+
+If you see these tools listed, MCP is working correctly.
+
+**Step 4 — Run a quick test via MCP:**
+
+```
+Use MCP to run tests/ui/smoke.spec.ts and show me the results.
+```
+
+This should execute the smoke tests and display pass/fail results.
 
 ---
 
