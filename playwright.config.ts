@@ -1,11 +1,19 @@
 import { defineConfig, devices } from '@playwright/test';
 import 'dotenv/config';
+import { Timeouts } from './utils';
 
 /**
  * Playwright Configuration
  *
  * This config reads environment variables from .env (via dotenv) and sets up
  * multi-browser testing with sensible defaults for both local and CI runs.
+ *
+ * Projects:
+ *   - setup:    Runs auth.setup.ts first (login, save storageState)
+ *   - chromium: UI tests in Chrome (depends on setup)
+ *   - firefox:  UI tests in Firefox (depends on setup)
+ *   - webkit:   UI tests in Safari (depends on setup)
+ *   - api:      API-only tests — no browser launched
  *
  * Usage:
  *   npm test            - Run all tests across all browsers
@@ -16,6 +24,9 @@ import 'dotenv/config';
  *
  * @see https://playwright.dev/docs/test-configuration
  */
+
+const AUTH_STATE_PATH = 'test-results/.auth/state.json';
+
 export default defineConfig({
   /* Directory where test files are located */
   testDir: './tests',
@@ -23,12 +34,12 @@ export default defineConfig({
   /* Directory for test artifacts (screenshots, videos, traces) */
   outputDir: './test-results',
 
-  /* Maximum time a single test can run (30 seconds) */
-  timeout: 30_000,
+  /* Maximum time a single test can run */
+  timeout: Timeouts.TEST,
 
-  /* Maximum time expect() assertions can wait (5 seconds) */
+  /* Maximum time expect() assertions can wait */
   expect: {
-    timeout: 5_000,
+    timeout: Timeouts.MEDIUM,
   },
 
   /* Run tests in parallel within each file */
@@ -37,22 +48,27 @@ export default defineConfig({
   /* Fail the build on CI if test.only is left in source code */
   forbidOnly: !!process.env.CI,
 
-  /* Retry failed tests: 2 retries on CI, 0 locally */
-  retries: process.env.CI ? 2 : 0,
+  /* Retry failed tests: 2 on CI, 1 locally (catches flaky tests during dev) */
+  retries: process.env.CI ? 2 : 1,
 
   /* Limit parallel workers on CI to avoid resource contention */
   workers: process.env.CI ? 1 : undefined,
 
-  /* Reporter configuration: HTML report (never auto-open) + list output */
-  reporter: [
-    ['html', { open: 'never' }],
-    ['list'],
-  ],
+  /* Reporter configuration */
+  reporter: process.env.CI
+    ? [['html', { open: 'never' }], ['list'], ['junit', { outputFile: 'test-results/junit.xml' }]]
+    : [['html', { open: 'on-failure' }], ['list']],
 
   /* Shared settings applied to all projects below */
   use: {
     /* Base URL for navigation actions like page.goto('/') */
-    baseURL: process.env.BASE_URL || 'http://example.com',
+    baseURL: process.env.BASE_URL || 'http://localhost:3000',
+
+    /* Timeout for actions like click(), fill(), etc. — fail fast instead of hanging */
+    actionTimeout: Timeouts.LONG,
+
+    /* Timeout for page.goto() and navigations */
+    navigationTimeout: Timeouts.NAVIGATION,
 
     /* Capture trace on first retry to help debug flaky tests */
     trace: 'on-first-retry',
@@ -69,19 +85,46 @@ export default defineConfig({
     },
   },
 
-  /* Multi-browser project configuration */
   projects: [
+    /* ---- Auth setup (runs before UI projects) ---- */
+    {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
+
+    /* ---- UI browser projects (depend on auth setup) ---- */
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: AUTH_STATE_PATH,
+      },
+      dependencies: ['setup'],
     },
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: {
+        ...devices['Desktop Firefox'],
+        storageState: AUTH_STATE_PATH,
+      },
+      dependencies: ['setup'],
     },
     {
       name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      use: {
+        ...devices['Desktop Safari'],
+        storageState: AUTH_STATE_PATH,
+      },
+      dependencies: ['setup'],
+    },
+
+    /* ---- API project (no browser — faster, cleaner separation) ---- */
+    {
+      name: 'api',
+      testDir: './tests/api',
+      use: {
+        baseURL: process.env.API_BASE_URL || 'https://httpbin.org',
+      },
     },
   ],
 });

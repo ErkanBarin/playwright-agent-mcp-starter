@@ -18,7 +18,10 @@ Production-ready starter for **UI + API test automation** with Playwright, TypeS
 ## What's Included
 
 - **UI testing** — Playwright Test with Page Object Model, custom fixtures, cross-browser (Chromium, Firefox, WebKit)
-- **API testing** — Playwright `request` API for HTTP testing, plus optional Postman/Newman skeleton
+- **API testing** — Dedicated browser-free project for fast HTTP testing via Playwright `request` API
+- **Auth setup project** — Runs once before UI tests, saves `storageState` so every test starts authenticated
+- **Test data factory** — Generates unique users, addresses, products, orders with optional overrides
+- **Timeout constants** — Named values (`Timeouts.SHORT`, `.LONG`, `.NAVIGATION`) instead of magic numbers
 - **11 AI agents** — Claude Code agents for test design, PR hygiene, security scanning, flake triage, coverage analysis, and more
 - **2 MCP servers** — `@playwright/mcp` (browser automation) + Playwright Test MCP (test runner)
 - **Docs library** — QA conventions, prompt library, PR workflow, security sanitization, MCP setup
@@ -37,7 +40,7 @@ npm install
 
 # 3. Set up environment
 cp .env.example .env
-# Edit .env → set BASE_URL to your app (defaults to http://example.com)
+# Edit .env → set BASE_URL to your app (defaults to http://localhost:3000)
 
 # 4. Set up MCP (optional, for Claude Code users)
 cp .mcp.json.example .mcp.json
@@ -48,14 +51,14 @@ npx playwright install
 # 6. Run one UI test (proof it works)
 npx playwright test tests/ui/smoke.spec.ts --project=chromium
 
-# 7. Run one API test
-npx playwright test tests/api/health.spec.ts --project=chromium
+# 7. Run API tests (no browser launched — fast)
+npx playwright test --project=api
 
 # 8. See the HTML report
 npm run report
 ```
 
-> **Note:** The defaults are `http://example.com` (UI) and `https://httpbin.org` (API) — all 10 tests pass out of the box against these public URLs. Change them in `.env` to point to your application.
+> **Note:** UI defaults to `http://localhost:3000`, API defaults to `https://httpbin.org`. All tests pass out of the box against these public URLs. Change them in `.env` to point to your application.
 
 ---
 
@@ -73,10 +76,16 @@ npm run report
 │   └── MCP_SETUP.md
 ├── pages/               # Page Object Models (base + login example)
 ├── tests/
+│   ├── auth.setup.ts    # Auth setup (runs before UI projects)
 │   ├── fixtures/        # Custom Playwright fixtures
 │   ├── ui/              # UI test specs (smoke.spec.ts)
 │   └── api/             # API test specs (health.spec.ts)
-├── utils/               # Shared helpers (env, API utilities)
+├── utils/
+│   ├── index.ts         # Barrel — import everything from '../utils'
+│   ├── timeouts.ts      # Named timeout constants (SHORT, MEDIUM, LONG, etc.)
+│   ├── data-factory.ts  # Test data generators (user, product, order, etc.)
+│   ├── api-helpers.ts   # API response assertion helpers
+│   └── env.ts           # Typed environment variable access
 ├── .mcp.json.example    # MCP server config template
 ├── playwright.config.ts
 └── package.json
@@ -94,6 +103,61 @@ npm run report
 | `npm run test:debug` | Run with Playwright Inspector |
 | `npm run report` | Open the HTML test report |
 | `npm run lint` | Lint TypeScript files |
+
+---
+
+## Project Architecture
+
+The config defines 5 projects that run in a specific order:
+
+```
+setup → chromium, firefox, webkit (parallel)
+                                        api (independent, no browser)
+```
+
+- **setup** — Authenticates once, saves browser state to `storageState`
+- **chromium/firefox/webkit** — UI tests that load the saved auth state (no login per test)
+- **api** — Runs against `tests/api/` with no browser — pure HTTP requests
+
+### Utilities (barrel import)
+
+All utils re-export from `utils/index.ts` — one import for everything:
+
+```typescript
+import { Timeouts, TestData, assertStatus, getBaseUrl } from '../utils';
+```
+
+### Timeouts
+
+```typescript
+await page.click(selector, { timeout: Timeouts.SHORT });   // 3s
+await expect(locator).toBeVisible({ timeout: Timeouts.MEDIUM }); // 5s
+await page.goto(url, { timeout: Timeouts.NAVIGATION });    // 15s
+```
+
+| Constant | Value | Use case |
+|----------|-------|----------|
+| `SHORT` | 3s | Quick visibility checks |
+| `MEDIUM` | 5s | Assertions, element interactions |
+| `LONG` | 10s | Actions (click, fill) |
+| `NAVIGATION` | 15s | Page navigations |
+| `TEST` | 30s | Per-test limit |
+| `EXTENDED` | 60s | Complex flows, uploads |
+| `GLOBAL` | 120s | Setup/teardown |
+
+### Test Data Factory
+
+Generate unique, realistic test data with optional overrides:
+
+```typescript
+import { TestData } from '../utils';
+
+const user = TestData.user();                        // random user
+const admin = TestData.user({ role: 'admin' });      // override role
+const product = TestData.product({ price: 9.99 });   // override price
+const order = TestData.order();                      // random order
+const email = TestData.email('signup');               // signup.k8f3x2@example.com
+```
 
 ---
 
