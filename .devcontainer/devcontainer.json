@@ -1,0 +1,10 @@
+{
+  "name": "Playwright Dev Container",
+  "image": "mcr.microsoft.com/playwright:v1.52.0-jammy",
+  "postCreateCommand": "npm ci",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-playwright.playwright"]
+    }
+  }
+}
