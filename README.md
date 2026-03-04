@@ -60,14 +60,21 @@ npm run report
 
 > **Note:** UI defaults to `http://localhost:3000`, API defaults to `https://httpbin.org`. All tests pass out of the box against these public URLs. Change them in `.env` to point to your application.
 
+> **Windows users:** This repo uses symlinks (`.claude/agents` and `.claude/skills` point to `ai/`). Run `git config core.symlinks true` before cloning, and enable Developer Mode in Windows Settings.
+
 ---
 
 ## Repository Structure
 
 ```
+├── ai/                  # Shared AI workspace (canonical location)
+│   ├── agents/          # AI agent definitions (test design, PR hygiene, security, etc.)
+│   ├── skills/          # Reusable prompt skills (MCP scout, prompt library)
+│   ├── prompts/         # Prompt templates
+│   └── knowledge/       # Domain knowledge and reference material
 ├── .claude/
-│   ├── agents/          # 11 AI agents (test design, PR hygiene, security, etc.)
-│   └── skills/          # Reusable prompt skills (MCP scout, prompt library)
+│   ├── agents -> ai/agents   # Symlink — Claude Code reads from ai/
+│   └── skills -> ai/skills   # Symlink — Claude Code reads from ai/
 ├── docs/
 │   ├── QA_CONTEXT.md    # Scope, selectors, waits, PR slicing
 │   ├── PROMPT_LIBRARY.md
@@ -163,13 +170,20 @@ const email = TestData.email('signup');               // signup.k8f3x2@example.c
 
 ---
 
-## AI Agents
+## AI Workspace
 
-11 Claude Code agents are included to accelerate QA workflows. They work inside Claude Code (CLI or VS Code extension).
+All AI resources live in the `ai/` directory — a shared workspace for Claude Code, GitHub Copilot, and other AI tools. Claude Code reads agents and skills via symlinks (`.claude/agents` → `ai/agents`, `.claude/skills` → `ai/skills`).
+
+Conventions for all AI tools are defined in [`AGENTS.md`](AGENTS.md) at the repo root. GitHub Copilot reads [`.github/copilot-instructions.md`](.github/copilot-instructions.md) which points back to `AGENTS.md`.
+
+### Agents
+
+12 agents are included to accelerate QA workflows:
 
 | Agent | Purpose |
 |-------|---------|
 | `qa-orchestrator` | Coordinates all specialist agents |
+| `test-generator` | Explores sites, maps journeys, generates tests |
 | `ui-test-designer` | Designs UI test cases from user stories |
 | `api-coverage-planner` | Plans API test coverage from endpoints |
 | `pr-hygiene` | Checks PR quality and standards |
@@ -231,6 +245,7 @@ See [.github/workflows/playwright.yml](.github/workflows/playwright.yml) for the
 
 ## Documentation
 
+- [AGENTS.md](AGENTS.md) — AI agent conventions and project standards
 - [MCP Setup](docs/MCP_SETUP.md) — MCP server configuration and sanity check
 - [QA Context & Conventions](docs/QA_CONTEXT.md) — scope, selectors, waits, PR slicing
 - [Prompt Library](docs/PROMPT_LIBRARY.md) — copy-paste prompts for agents
