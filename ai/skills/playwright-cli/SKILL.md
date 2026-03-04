@@ -1,90 +1,80 @@
 ---
 name: playwright-cli
-description: Use Playwright MCP to browse websites, snapshot elements, interact with pages, and convert sessions into Playwright tests
+description: Use Playwright CLI to browse websites, snapshot elements, interact with pages, and convert sessions into Playwright tests
 tools: [Read, Glob, Bash]
 ---
 
 # Playwright CLI Skill
 
-Use the Playwright MCP server to interactively browse websites and convert interactions into Playwright tests.
+Use `@playwright/cli` to interactively browse websites and convert interactions into Playwright tests.
 
-## Capabilities
+## Installation
+
+```bash
+npm install -g @playwright/cli@latest
+```
+
+## Commands
 
 ### 1. Open a Website
 
-Navigate to any URL and get a structured view of the page.
-
-```
-Navigate to https://example.com and describe the page structure.
+```bash
+playwright open https://example.com
 ```
 
-The MCP `playwright` server provides browser automation. Use it to:
-- Load any URL in a real browser
-- Wait for the page to be fully loaded
-- Capture the initial state for further interaction
+Opens a Chromium browser with the Playwright inspector attached.
 
 ### 2. Snapshot Page Elements
 
-Take an accessibility snapshot to discover all interactive elements on the page.
-
-```
-Take an accessibility snapshot of the current page and list all interactive elements.
+```bash
+playwright screenshot https://example.com screenshot.png
 ```
 
-The snapshot returns a structured tree of:
-- Roles (button, link, textbox, heading, etc.)
-- Accessible names and labels
-- States (checked, disabled, expanded, etc.)
+Or use the inspector (opened via `playwright open`) to explore the accessibility tree and discover selectors interactively.
 
-Use this to determine the best selectors for test automation.
+### 3. Code Generation (Record Mode)
 
-### 3. Interact with Buttons and Forms
-
-Perform user actions through the MCP server.
-
-```
-Fill the email field with "test@example.com" and click the Login button.
+```bash
+playwright codegen https://example.com
 ```
 
-Supported interactions:
-- **Click** — buttons, links, checkboxes, radio buttons
-- **Fill** — text inputs, textareas, search fields
-- **Select** — dropdown menus and select elements
-- **Check/Uncheck** — checkboxes and toggle switches
-- **Hover** — trigger tooltips and dropdown menus
-- **Keyboard** — press Enter, Tab, Escape, type text
+Opens a browser and records your interactions as Playwright test code in real time. This is the fastest way to scaffold a test:
 
-### 4. Convert Interactions into Playwright Tests
+- Click, fill, select — all recorded as `getByRole` / `getByLabel` selectors
+- Assertions auto-generated for navigation and visibility
+- Output is valid TypeScript that can be pasted into a spec file
 
-After exploring a page and performing interactions, generate a Playwright test.
+### 4. Convert Recorded Code into Repo-Compliant Tests
 
-```
-Convert the login flow I just performed into a Playwright test following repo conventions.
-```
+After recording with `codegen`, adapt the output to match repo conventions:
 
-When generating tests:
-1. Use selectors discovered from the accessibility snapshot
-2. Prefer `getByRole`, `getByLabel`, `getByText` over CSS selectors
-3. Follow the Page Object Model — create or update a page object in `pages/`
-4. Save the test spec in `tests/e2e/`
-5. Add appropriate tags (`@smoke`, `@regression`)
-6. Use `utils/data-factory.ts` for test data
+1. Replace raw `page.locator()` calls with accessibility selectors (`getByRole`, `getByLabel`, `getByText`)
+2. Wrap interactions in a Page Object in `pages/`
+3. Save the spec in `tests/e2e/`
+4. Add tags (`@smoke`, `@regression`)
+5. Use `utils/data-factory.ts` for test data instead of hard-coded values
 
 ## Workflow Example
 
+```bash
+# 1. Record a login flow
+playwright codegen https://myapp.com/login
+
+# 2. Copy the generated code
+
+# 3. Refactor into POM + spec following repo conventions
+
+# 4. Run the test
+npx playwright test tests/e2e/login.spec.ts --project=chromium
 ```
-Step 1: "Navigate to /login"
-Step 2: "Snapshot the page — what form fields are present?"
-Step 3: "Fill email with test@example.com, fill password with secret123, click Sign In"
-Step 4: "What page did we land on? Snapshot it."
-Step 5: "Generate a Playwright test for this login flow"
-```
 
-## Server Selection
+## Other Useful Commands
 
-| Action | MCP Server |
-|--------|------------|
-| Browse, click, fill, snapshot | `playwright` |
-| Run generated tests | `playwright-test` |
-
-See the `mcp-scout` skill for the full decision tree.
+| Command | Purpose |
+|---------|---------|
+| `playwright open <url>` | Open URL with inspector |
+| `playwright codegen <url>` | Record interactions as code |
+| `playwright screenshot <url> <file>` | Capture a screenshot |
+| `playwright pdf <url> <file>` | Save page as PDF |
+| `playwright install` | Install browsers |
+| `playwright test --ui` | Open Playwright Test UI mode |

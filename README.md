@@ -42,11 +42,13 @@ npm install
 cp .env.example .env
 # Edit .env → set BASE_URL to your app (defaults to http://localhost:3000)
 
-# 4. Set up MCP (optional, for Claude Code users)
+# 4. Set up MCP (optional, for Claude Code / AI agent users)
 cp .mcp.json.example .mcp.json
+# MCP servers run via npx — no extra install needed
 
-# 5. Install browsers
+# 5. Install browsers + Playwright CLI
 npx playwright install
+npm install -g @playwright/cli@latest  # optional, for codegen/open/screenshot
 
 # 6. Run one UI test (proof it works)
 npx playwright test tests/ui/smoke.spec.ts --project=chromium
