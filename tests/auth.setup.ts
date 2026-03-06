@@ -79,14 +79,14 @@ setup('authenticate', async ({ page }) => {
   //
   //   await page.goto('/login');
   //   await page.getByLabel('Email').fill('testuser@example.com');
-  //   await page.getByLabel('Password').fill('password123');
+  //   await page.getByLabel('Password').fill(process.env.TEST_PASSWORD ?? '<from-env>');
   //   await page.getByRole('button', { name: 'Sign in' }).click();
   //   await page.waitForURL('/dashboard');
   //
   // Example for API-based auth (faster):
   //
   //   const response = await page.request.post('/api/auth/login', {
-  //     data: { email: 'testuser@example.com', password: 'password123' },
+  //     data: { email: process.env.TEST_EMAIL, password: process.env.TEST_PASSWORD },
   //   });
   //   const { token } = await response.json();
   //   await page.goto('/');
