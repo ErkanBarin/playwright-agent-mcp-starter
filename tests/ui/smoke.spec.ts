@@ -63,12 +63,12 @@ test.describe('Home Page Smoke Tests @ui', () => {
     // Check for heading elements (every page should have at least one heading)
     const headings = homePage.getByRole('heading');
     const headingCount = await headings.count();
-    expect(headingCount).toBeGreaterThanOrEqual(0);
+    expect(headingCount).toBeGreaterThan(0);
 
     // Check for link elements (most pages have at least one link)
     const links = homePage.getByRole('link');
     const linkCount = await links.count();
-    expect(linkCount).toBeGreaterThanOrEqual(0);
+    expect(linkCount).toBeGreaterThan(0);
   });
 
   test('no console errors on page load', async ({ page, baseURL }) => {

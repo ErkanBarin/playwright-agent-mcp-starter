@@ -9,7 +9,8 @@
     "test:api": "npx playwright test --grep @api",
     "test:debug": "npx playwright test --debug",
     "report": "npx playwright show-report",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "setup:playwright": "npx playwright install --with-deps chromium"
   },
   "devDependencies": {
     "@playwright/mcp": "^0.0.19",
