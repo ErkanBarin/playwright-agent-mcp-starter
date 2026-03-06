@@ -28,7 +28,7 @@ import { APIRequestContext, APIResponse, expect } from '@playwright/test';
  *   const apiContext = await createRequestContext(
  *     playwright,
  *     'https://api.example.com',
- *     { 'Authorization': 'Bearer token123' }
+ *     { 'Authorization': `Bearer ${process.env.API_TOKEN ?? '<your-token>'}` }
  *   );
  *   const response = await apiContext.get('/users');
  */
